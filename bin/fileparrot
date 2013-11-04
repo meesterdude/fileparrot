@@ -1,8 +1,6 @@
 #!/usr/bin/env ruby
 #
 require 'optparse'
-require 'yaml'
-require 'pry'
 require 'erubis'
 PATTERN = '<%% %%>'
 append = true
@@ -40,19 +38,19 @@ def timestamp
   Time.now.strftime("%m/%d/%Y @ %I:%M%p")
 end
 
-puts "#### ListEgg ####".pink
+puts "#### FileParrot ####".pink
 puts "#### 2013 Russell Jennings ####".pink
 
 options = {}
 OptionParser.new do |opts|
-  opts.banner = "Usage: example.rb [options]"
+  opts.banner = "Usage: fileparrot[options]"
 
   opts.on('-d', '--source_dir DIR', 'Source dir (required)') { |v| options[:source_dir] = v }
   opts.on('-n', '--source_name NAME', 'Source name (required)') { |v| options[:source_name] = v }
   opts.on('-D', '--destination_dir DIR', 'Destination Dir (required)') { |v| options[:destination_dir] = v }
   opts.on('-N', '--destination_name NAME', "Destination name (defaults to the name of source_name)"){ |v| options[:destination_name] = v }
   opts.on('-a', '--no_append', 'create or overwrite instead of append') { |v| options[:append] = v }
-  opts.on('-x', '--no_parse', 'Do not parse file for ERB (we parse by default. use <%% tags %%>) for erb') { |v| options[:no_parse] = v }
+  opts.on('-x', '--no_parse', 'Do not parse file for ERB (<%% %%> parsed by default)') { |v| options[:no_parse] = v }
   opts.on_tail("-h", "--help", "Show this message") do
     puts opts
     exit
@@ -76,7 +74,7 @@ range = [*input.index("---\n")..input.rindex("---\n")] unless input.rindex("---\
 range ||= []
 output = []
 input.each_index{|i| output << input[i] unless range.include?(i)}
-output_file = options[:destination_dir] + '/' + (options[:destination_name] ? "#{options[:destination_name]} #{file.split(".").last}" : file.split("/").last)
+output_file = options[:destination_dir] + '/' + (options[:destination_name] ? "#{options[:destination_name]}.#{file.split(".").last}" : file.split("/").last)
 
 # join array and run through ruby processing
 output = output.join("\n")
