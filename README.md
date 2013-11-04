@@ -1,6 +1,6 @@
 # FileParrot
 
-FileParrot is a simple tool to help you capture data thats relevant to you. Use it to log your workouts, as a journal, or sometime else entirely.
+FileParrot is a simple tool to help you capture data thats relevant to you. Use it to log your workouts, as a journal, or something else entirely.
 
 ## Examples
 Some example files created by FileParrot
@@ -134,7 +134,7 @@ Usage: listparrot [options]
 It is recommended to preset some of these values by aliasing the method. See the install section for details.
 
 ### Automagic logging
-If you just want to track the occurrence of something, you don't need to create a template. Just pass in the name as usual, and if a source file can't be found, it'll just append a timestamp to a destination file of that name.
+If you just want to track the occurrence of something, you don't need to create a template. Just pass in the name as usual, and if a source file can't be found, it'll just append a time stamp to a destination file of that name.
 
 ```
 $ fp litter_box
