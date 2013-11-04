@@ -1,0 +1,88 @@
+#!/usr/bin/env ruby
+#
+require 'optparse'
+require 'yaml'
+require 'pry'
+require 'erubis'
+PATTERN = '<%% %%>'
+append = true
+
+class String
+  def colorize(text, color_code) "\e[#{color_code}m#{text}\e[0m" end
+  def red()     colorize(self, 31) end
+  def green()   colorize(self, 32) end
+  def yellow()  colorize(self, 33) end
+  def pink()    colorize(self, 35) end
+end
+
+
+def write_file(file, content, append = nil)
+  write_method = append ? 'a' : 'w'
+  File.open(file, write_method) do  |f|
+    f.write content
+  end
+end
+
+
+def ask(question, options=nil)
+  puts question
+  if options
+    options.each_with_index{|o,i| puts "#{i + 1}) #{o}"}
+
+    answer = STDIN.gets.chop.downcase.split(',')
+    answer = answer.collect{|a| options[a.to_i - 1]}.join(", ")
+  else
+    answer = STDIN.gets.chop.downcase
+  end
+end
+
+def timestamp
+  Time.now.strftime("%m/%d/%Y @ %I:%M%p")
+end
+
+puts "#### ListEgg ####".pink
+puts "#### 2013 Russell Jennings ####".pink
+
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: example.rb [options]"
+
+  opts.on('-d', '--source_dir DIR', 'Source dir (required)') { |v| options[:source_dir] = v }
+  opts.on('-n', '--source_name NAME', 'Source name (required)') { |v| options[:source_name] = v }
+  opts.on('-D', '--destination_dir DIR', 'Destination Dir (required)') { |v| options[:destination_dir] = v }
+  opts.on('-N', '--destination_name NAME', "Destination name (defaults to the name of source_name)"){ |v| options[:destination_name] = v }
+  opts.on('-a', '--no_append', 'create or overwrite instead of append') { |v| options[:append] = v }
+  opts.on('-x', '--no_parse', 'Do not parse file for ERB (we parse by default. use <%% tags %%>) for erb') { |v| options[:no_parse] = v }
+  opts.on_tail("-h", "--help", "Show this message") do
+    puts opts
+    exit
+  end
+end.parse!
+
+unless options[:source_dir] && options[:source_name] && options[:destination_dir]
+puts "did not supply enough options. run with -h to see whats required. "
+abort
+end
+
+file = Dir.glob("#{options[:source_dir]}/#{options[:source_name]}.*").first
+if file
+  f = File.open(file, "r")
+  input = f.readlines
+else
+  file = options[:source_name]
+  input = [timestamp + "\n"]
+end
+range = [*input.index("---\n")..input.rindex("---\n")] unless input.rindex("---\n").nil? || input.index("---\n").nil?
+range ||= []
+output = []
+input.each_index{|i| output << input[i] unless range.include?(i)}
+output_file = options[:destination_dir] + '/' + (options[:destination_name] ? "#{options[:destination_name]} #{file.split(".").last}" : file.split("/").last)
+
+# join array and run through ruby processing
+output = output.join("\n")
+output = Erubis::Eruby.new(output, :pattern => PATTERN).result(binding()) unless options[:no_parse]
+append = !append if options[:append]
+write_file(output_file, output, append)
+puts (append ? "The following was appended to: ".green : "The following was created in: ".green) + output_file
+puts output.yellow
+puts "All done!".green

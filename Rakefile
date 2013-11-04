@@ -11,14 +11,18 @@ rescue Bundler::BundlerError => e
 end
 require 'rake'
 
+
+
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
+  gem.version = File.read('VERSION').chomp
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "fileparrot"
   gem.homepage = "http://github.com/meesterdude/fileparrot"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.executables   = ["fileparrot"]
+  gem.summary = %Q{makes custom data capture to text files easy}
+  gem.description = %Q{fileparrot is a simple tool to help you capture data to textfiles. use it for journals, workout logs, or whatever you desire.}
   gem.email = "violentpurr@gmail.com"
   gem.authors = ["Russell Jennings"]
   # dependencies defined in Gemfile
@@ -32,13 +36,6 @@ Rake::TestTask.new(:test) do |test|
   test.verbose = true
 end
 
-require 'rcov/rcovtask'
-Rcov::RcovTask.new do |test|
-  test.libs << 'test'
-  test.pattern = 'test/**/test_*.rb'
-  test.verbose = true
-  test.rcov_opts << '--exclude "gems/*"'
-end
 
 task :default => :test
 
