@@ -2,6 +2,7 @@
 #
 require 'optparse'
 require 'erubis'
+require 'pry'
 PATTERN = '<%% %%>'
 append = true
 
@@ -14,8 +15,9 @@ class String
 end
 
 
-def write_file(file, content, append = nil)
+def write_file(file, content, append = nil, options)
   write_method = append ? 'a' : 'w'
+  FileUtils.mkdir_p(options[:destination_dir]) unless File.exists? file
   File.open(file, write_method) do  |f|
     f.write content
   end
@@ -80,7 +82,7 @@ output_file = options[:destination_dir] + '/' + (options[:destination_name] ? "#
 output = output.join("\n")
 output = Erubis::Eruby.new(output, :pattern => PATTERN).result(binding()) unless options[:no_parse]
 append = !append if options[:append]
-write_file(output_file, output, append)
+write_file(output_file, output, append, options)
 puts (append ? "The following was appended to: ".green : "The following was created in: ".green) + output_file
 puts output.yellow
 puts "All done!".green
